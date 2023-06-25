@@ -82,36 +82,65 @@ app.post("/admin/deleteCentre", async (req, res) => {
 
 app.post("/admin/getCentreDetails", async (req, res) => {
   const centreId = req.body.centreData;
+  const result = {};
   const centreDetails = await prisma.centres.findUnique({
     where: {
       centre_id: centreId,
     },
   });
-  res.json({ data: centreDetails });
+  result.centreDetails = centreDetails;
+
+  const dosageDetails = await prisma.dosage.groupBy({
+    by: ["date"],
+    _count: true,
+    where: {
+      centre_id: centreId,
+    },
+  });
+  result.dosageDetails = dosageDetails;
+  res.json({ data: result });
 });
 
-app.get("/user/getProfile", async (req, res) => {
-  const userId = req.body.profileData;
-  const profile = await prisma.user.findUnique({
+app.post("/user/getProfile", async (req, res) => {
+  const profile = await prisma.user.findFirst({
     where: {
-      id: userId,
+      id: req.body.userId,
     },
   });
   res.json({ data: profile });
 });
 
 app.post("/user/bookSlot", async (req, res) => {
-  var date = new Date();
-  date.toISOString().slice(0, 10);
   const bookingData = req.body.bookingData;
-  const booking = await prisma.dosage.create({
-    data: {
-      user_id: req.body.userId,
+
+  const numSlots = await prisma.dosage.count({
+    where: {
       centre_id: bookingData.centreId,
-      date: date,
+      date: new Date(bookingData.date),
     },
   });
-  res.json({ data: booking });
+
+  const maxSlots = await prisma.centres.findUnique({
+    where: {
+      centre_id: bookingData.centreId,
+    },
+  });
+
+  if (numSlots < maxSlots.slots) {
+    const booking = await prisma.dosage.create({
+      data: {
+        user_id: req.body.userId,
+        centre_id: bookingData.centreId,
+        date: new Date(bookingData.date),
+      },
+    });
+    res.json({ data: booking, status: 1 });
+  } else {
+    res.json({
+      status: 0,
+      message: "Sorry! There are no slots available on this date.",
+    });
+  }
 });
 
 // Starting server using listen function
