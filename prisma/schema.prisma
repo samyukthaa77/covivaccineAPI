@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model centres {
+  centre_id Int     @id @unique(map: "centre_id_UNIQUE") @default(autoincrement())
+  name      String? @db.VarChar(45)
+  city      String? @db.VarChar(45)
+  state     String? @db.VarChar(45)
+  start     String? @db.VarChar(45)
+  end       String? @db.VarChar(45)
+  slots     Int?
+  address   String? @db.VarChar(45)
+  link      String? @db.VarChar(300)
+}
+
+model user {
+  id         Int     @id @unique(map: "id_UNIQUE") @default(autoincrement())
+  type       String? @db.VarChar(45)
+  first_name String? @db.VarChar(45)
+  last_name  String? @db.VarChar(45)
+  age        Int?
+  emailid    String? @unique @db.VarChar(45)
+  password   String? @db.VarChar(45)
+  phone      String? @db.VarChar(45)
+  city       String? @db.VarChar(45)
+  state      String? @db.VarChar(45)
+}
+
+model dosage {
+  id        Int       @id @default(autoincrement())
+  user_id   Int?
+  centre_id Int?
+  date      DateTime? @db.Date
+}
