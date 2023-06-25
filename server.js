@@ -27,6 +27,7 @@ app.post("/user/login", async (req, res) => {
   const userData = req.body.userData;
   const authUser = await prisma.user.findFirst({
     where: {
+      type: "user",
       emailid: userData.emailid,
       password: userData.password,
     },
@@ -43,11 +44,16 @@ app.post("/admin/login", async (req, res) => {
   console.log(adminData);
   const authAdmin = await prisma.user.findFirst({
     where: {
+      type: "admin",
       id: adminData.adminId,
       password: adminData.password,
     },
   });
-  res.json({ data: authAdmin });
+  if (authAdmin && authAdmin.id) {
+    res.json({ data: authAdmin, status: 1 });
+  } else {
+    res.json({ status: 0 });
+  }
 });
 
 app.post("/admin/addCentre", async (req, res) => {
