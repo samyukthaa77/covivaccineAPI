@@ -12,7 +12,7 @@ const app = express(); // Creating an express object
 app.use(express.json());
 app.use(cors());
 
-const port = 8000; // Setting an port for this application
+const port = 80; // Setting an port for this application
 // HTTPS
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -169,3 +169,5 @@ app.listen(port, function (err) {
     console.log("Server has been started at " + port);
   }
 });
+
+export default app;
