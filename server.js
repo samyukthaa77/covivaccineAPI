@@ -1,27 +1,14 @@
-import { PrismaClient } from "@prisma/client";
+const { PrismaClient } = require("@prisma/client");
 const prisma = new PrismaClient();
 
-import express from "express"; // Importing express module
-import cors from "cors";
-import fs from "fs";
-import https from "https";
-import path from "path";
-import { fileURLToPath } from "url";
+const express = require("express"); // Importing express module
+const cors = require("cors");
 
 const app = express(); // Creating an express object
 app.use(express.json());
 app.use(cors());
 
-const port = 80; // Setting an port for this application
-// HTTPS
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-var key = fs.readFileSync(__dirname + "/certs/selfsigned.key");
-var cert = fs.readFileSync(__dirname + "/certs/selfsigned.crt");
-var options = {
-  key: key,
-  cert: cert,
-};
+const port = 8000; // Setting an port for this application
 
 app.get("/", function (req, res) {
   res.send("we are at the root route of our server");
@@ -156,11 +143,6 @@ app.post("/user/bookSlot", async (req, res) => {
   }
 });
 
-var server = https.createServer(options, app);
-
-server.listen(443, () => {
-  console.log("https server running on port 443");
-});
 // Starting server using listen function
 app.listen(port, function (err) {
   if (err) {
@@ -170,4 +152,4 @@ app.listen(port, function (err) {
   }
 });
 
-export default app;
+module.exports = app;
